@@ -1,58 +1,30 @@
 # -*- coding: utf-8 -*-
 
-import speech_recognition.base as sr
-from os import system
+from speech_recognition.base import Microphone
+from speech_recognition.sr_main import SR
+from text_to_speech.tts_main import TTS
 
-r = sr.Recognizer()
-m = sr.Microphone()
-
-lauguage = 'zh-CN'
-# lauguage = 'en-US'
-
-def speak_chinese(str):
-    system(('say -v Mei-Jia ' + str).encode('utf-8'))
-
-BING_KEY = "f2004b4375df4f4bab41e35b2ce1a493"
-access_token = r.connect_bing_reco_sevice(BING_KEY)
+m = Microphone()
+sr = SR(language='zh-CN')
+tts = TTS(language='zh-CN')
 
 try:
-    print("A moment of silence, please...")
-    with m as source: r.adjust_for_ambient_noise(source)
-    r.energy_threshold = r.energy_threshold * 1.5
-    r.dynamic_energy_threshold = False
-    print("Set minimum energy threshold to {}".format(r.energy_threshold))
+    sr.initialize_system(m)
+    tts.tts(u'你好主人，我是旺财，汪汪')
     while True:
-        print("Say something!")
-        with m as source: audio = r.listen(source)
-        print("Got it! Now to recognize it...")
 
+        audio = sr.listen()
 
-        # recognize speech using Microsoft Bing Voice Recognition
-        try:
-            command = r.recognize_bing(audio, key=BING_KEY, access_token=access_token, language=lauguage)
-            print(" -Microsoft Bing Voice Recognition: " + command)
-        except sr.UnknownValueError:
-            print(" -Microsoft Bing Voice Recognition could not understand audio")
-            continue
-        except sr.RequestError as e:
-            print(" -Could not request results from Microsoft Bing Voice Recognition service; {0}".format(e))
-            continue
+        text = sr.sr(audio)
 
-        if command == u'你好':
-            speak_chinese(u'你好')
-        elif command == u'时间':
-            speak_chinese(u'我不知道')
-
-        # # recognize speech using Google Speech Recognition
-        # try:
-        #     # for testing purposes, we're just using the default API key
-        #     # to use another API key, use `r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")`
-        #     # instead of `r.recognize_google(audio)`
-        #     print(" -Google Speech Recognition: " + r.recognize_google(audio, language=lauguage))
-        # except sr.UnknownValueError:
-        #     print(" -Google Speech Recognition could not understand audio")
-        # except sr.RequestError as e:
-        #     print(" -Could not request results from Google Speech Recognition service; {0}".format(e))
+        if text == u'你好':
+            tts.tts(u'你好，汪汪')
+        elif text == u'再见':
+            tts.tts(u'再见，汪汪')
+        elif text is None:
+            tts.tts(u'说人话主人，汪汪')
+        else:
+            tts.tts(u'对不起主人，我听不懂，汪汪')
 
 except KeyboardInterrupt:
     pass

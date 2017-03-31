@@ -938,14 +938,14 @@ class Recognizer(AudioSource):
             "Authorization": "Bearer {}".format(access_token),
             "Content-Type": "audio/wav; samplerate=16000; sourcerate={}; trustsourcerate=true".format(audio_data.sample_rate),
         })
-        print 1
+        # print 1
         try:
             response = urlopen(request, timeout=self.operation_timeout)
         except HTTPError as e:
             raise RequestError("recognition request failed: {}".format(e.reason))
         except URLError as e:
             raise RequestError("recognition connection failed: {}".format(e.reason))
-        print 2
+        # print 2
         response_text = response.read().decode("utf-8")
         result = json.loads(response_text)
 
